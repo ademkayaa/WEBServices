@@ -14,10 +14,54 @@ import java.util.Date;
 public class OrchestrationService implements IOrchestrationService {
 
     @Override
-    public boolean addOrchestration(Orchestration value){
-        return false;
+    public boolean addOrchestration(Orchestration value, List<Job> jobs, List<Rule> rules, String Username)
+    {
+    	List<Integer> JobIdList = new ArrayList<>();
+    	List<Integer> RuleIdList = new ArrayList<>();
+
+    	//End nodes
+    	JobIdList.add(0);
+    	RuleIdList.add(0);
+    	
+    	//Saving jobs to the database
+    	// and adding their generated id's from db to JobIdList.
+    	for(Job temp : jobs)
+    		JobIdList.add(addJobSub(temp));
+
+    	//Saving rules to db.
+    	// creating edges between rules declared from gui.
+    	// adding Rule id's to the RuleIdList.
+    	for(Rule temp : rules)
+    	{
+    		temp.setYesEdge(JobIdList.get(temp.getYesEdge()));
+    		temp.setNoEdge(JobIdList.get(temp.getNoEdge()));
+    		RuleIdList.add(this.addRuleSub(temp));
+    	}
+    	
+    	//Updating all jobs with their associated rules with db ids.
+    	for(int search = 1; search < JobIdList.size(); ++search)
+    	{
+    		JobDAO accessingDb = new JobDAO();
+    		Job workon;
+			try {
+				workon = accessingDb.getJob(search);
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				System.err.println("Error to acces given id");
+				return false;
+			}
+    		try {
+				accessingDb.UpdateJob(search, "RuleId", RuleIdList.get(workon.getRuleId() - 1));
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				System.err.println("Error to acces given id");
+				return false;
+			}
+    	}
+        return true;
     }
 
+    
     @Override
     public boolean addJob(Job value){
         return addJobSub(value) > 0;
