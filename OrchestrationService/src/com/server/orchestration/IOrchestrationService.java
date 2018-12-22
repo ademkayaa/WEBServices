@@ -7,7 +7,7 @@ import com.db.biztalk.*;
 
 import javax.xml.ws.Endpoint;
 
-@WebService(name = "OrchestrationService", targetNamespace = "")
+@WebService(name = "OrchestrationService", serviceName = "OrchestrationService", targetNamespace = "http://localhost:9000/HelloWorld", wsdlLocation = "http://localhost:9000/HelloWorld")
 public interface IOrchestrationService {
 
     @WebMethod(action = "add_orchestration", operationName = "addOrchestration")
