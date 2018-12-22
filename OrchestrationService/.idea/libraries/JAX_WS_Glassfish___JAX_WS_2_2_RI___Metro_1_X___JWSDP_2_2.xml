@@ -23,6 +23,7 @@
       <root url="jar://$PROJECT_DIR$/lib/jaxb-xjc.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/woodstox-core-asl.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/jaxws-rt.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/BizTalkDB.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
