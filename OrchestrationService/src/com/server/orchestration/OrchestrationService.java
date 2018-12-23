@@ -3,20 +3,19 @@ package com.server.orchestration;
 import com.db.biztalk.*;
 
 import javax.jws.WebService;
-import javax.xml.ws.Endpoint;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-@WebService(endpointInterface = "com.server.orchestration.IOrchestrationService")
+@WebService(endpointInterface = "com.server.orchestration.IOrchestrationService",
+            serviceName = "OrchestrationService")
 public class OrchestrationService implements IOrchestrationService {
 
     @Override
-    public boolean addOrchestration(Orchestration value, List<Job> jobs, List<Rule> rules, String Username)
-    {
-    	List<Integer> JobIdList = new ArrayList<>();
+    public boolean addOrchestration(Orchestration value, List<Job> jobs, List<Rule> rules) {
+        List<Integer> JobIdList = new ArrayList<>();
     	List<Integer> RuleIdList = new ArrayList<>();
 
     	//End nodes
@@ -46,22 +45,29 @@ public class OrchestrationService implements IOrchestrationService {
 			try {
 				workon = accessingDb.getJob(search);
 			} catch (Exception e1) {
-				// TODO Auto-generated catch block
-				System.err.println("Error to acces given id");
+				System.err.println("Error to access given id");
 				return false;
 			}
     		try {
 				accessingDb.UpdateJob(search, "RuleId", RuleIdList.get(workon.getRuleId() - 1));
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				System.err.println("Error to acces given id");
+				System.err.println("Error to access given id");
 				return false;
 			}
     	}
+
+    	// Adding orchestration value to db.
+    	try {
+            OrchestrationDAO orchestrationDAO = new OrchestrationDAO();
+            orchestrationDAO.insertOrchestration(value);
+        } catch (Exception e) {
+    	    System.err.println("Orchestration could not be introduced: " + e);
+            return false;
+    	}
+
         return true;
     }
 
-    
     @Override
     public boolean addJob(Job value){
         return addJobSub(value) > 0;
@@ -119,9 +125,4 @@ public class OrchestrationService implements IOrchestrationService {
         return 1;
     }
 
-    public static void main(String[] argv) {
-        Object implementor = new OrchestrationService();
-        String address = "http://localhost:9000/HelloWorld";
-        Endpoint.publish(address, implementor);
-    }
 }
